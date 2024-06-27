@@ -1,6 +1,7 @@
 import React from 'react';
 import Bio from "./Bio";
 import ProjectsSection from "./ProjectsSection";
+import Comments from "./Comments";
 
 
 
@@ -10,6 +11,7 @@ const Body = () => {
         <>
             <Bio></Bio>
             <ProjectsSection></ProjectsSection>
+            <Comments></Comments>
         </>
     )
 }

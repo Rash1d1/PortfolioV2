@@ -18,18 +18,10 @@ const Comments = () => {
     const [comments, setComments] = useState<IComment[]>([
         {
             id: 1,
-            display: "Initial comment",
-            date: "01-01-2001",
+            display: "Cool guy!",
+            date: "20-06-2024",
             author: "admin",
-            children: [
-                {
-                    id: 2,
-                    display: "1 reply",
-                    date: "09-02-2004",
-                    author: "user__name",
-                    children: [],
-                },
-            ],
+            children: [],
         },
     ]);
 
@@ -46,11 +38,12 @@ const Comments = () => {
             author: author,
             date: new Date()
                 .toLocaleString("en-GB", {
+                    hour: "2-digit",
+                    minute: "2-digit",
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
+
                 })
                 .replace(/\//g, ":"),
             children: [],
@@ -77,33 +70,35 @@ const Comments = () => {
     };
 
     return (
-        <div className="m-4 p-4 border border-gray-400 rounded-lg">
-            <div className="mb-4 border border-gray-400 rounded-lg p-2.5">
+        <div className="m-4 mt-12 p-4 border border-gray-400 rounded-3xl text-center">
+            <h1 className="font-bold text-4xl mb-5 mt-2">Recommendations</h1>
+            <div className="mb-4 p-2.5">
                 <input
-                    onChange={(e) => setComment({ ...comment, author: e.target.value })}
+                    onChange={(e) => setComment({...comment, author: e.target.value})}
                     type="text"
                     placeholder="Your name..."
-                    className="w-full mb-2.5 p-1.5 text-lg border border-gray-400 rounded-lg box-border"
+                    className="w-full mb-2.5 p-3 text-lg border border-gray-400 rounded-lg box-border"
                 />
                 <textarea
-                    onChange={(e) => setComment({ ...comment, text: e.target.value })}
+                    onChange={(e) => setComment({...comment, text: e.target.value})}
                     placeholder="Your comment..."
-                    className="w-full mb-2.5 p-1.5 text-lg border border-gray-400 rounded-lg box-border"
+                    className="w-full mb-2.5 p-3 text-lg border border-gray-400 rounded-lg box-border"
                 />
                 <button
                     onClick={() => {
                         setComments([newComment(comment.author, comment.text), ...comments]);
-                        setComment({ author: "", text: "" });
+                        setComment({author: "", text: ""});
                     }}
-                    className="bg-green-500 text-white border-none rounded-lg p-1.5 px-5 cursor-pointer"
+                    className="bg-gradient-to-br from-[#A23A2C] to-[#C46655] text-center text-xl text-white border-none rounded-lg px-[10rem] py-2 cursor-pointer hover:bg-gradient-to-br hover:from-[#C46655] hover:to-[#A23A2C] transition duration-200 ease-in-out"
                 >
                     Submit
                 </button>
+
             </div>
 
             <div>
                 {comments.map((comment) => (
-                    <Comment key={comment.id} comment={comment} addReply={addReply} />
+                    <Comment key={comment.id} comment={comment} addReply={addReply}/>
                 ))}
             </div>
         </div>
