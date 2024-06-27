@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Comment from "./Comment";
+import {useUser, useSupabaseClient} from "@supabase/auth-helpers-react";
 
 export interface IComment {
     id: number;
     display: string;
     date: string;
     author: string;
-    children: IComment[];
+    parentId?: number;
 }
 
 const Comments = () => {
@@ -15,23 +16,22 @@ const Comments = () => {
         text: "",
     });
 
-    const [comments, setComments] = useState<IComment[]>([
-        {
-            id: 1,
-            display: "Cool guy!",
-            date: "20-06-2024",
-            author: "admin",
-            children: [],
-        },
-    ]);
+    const [comments, setComments] = useState<IComment[]>([]);
+    const supabase = useSupabaseClient();
 
-    const addReply = (commentId: number, replyAuthor: string, replyText: string) => {
-        let commentsWithNewReply = [...comments];
-        insertComment(commentsWithNewReply, commentId, replyAuthor, replyText);
-        setComments(commentsWithNewReply);
+    const addReply = async (parentId: number, replyAuthor: string, replyText: string) => {
+        const newReply = newComment(replyAuthor, replyText, parentId);
+        setComments([...comments, newReply]);
+
+        // Add the reply to Supabase
+        const { error } = await supabase.from("comments").insert([newReply]);
+
+        if (error) {
+            console.error("Error adding reply:", error);
+        }
     };
 
-    const newComment = (author: string, text: string) => {
+    const newComment = (author: string, text: string, parentId?: number) => {
         return {
             id: new Date().getTime(),
             display: text,
@@ -43,30 +43,15 @@ const Comments = () => {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",
-
                 })
                 .replace(/\//g, ":"),
-            children: [],
+            parentId: parentId,
         };
     };
 
-    const insertComment = (
-        comments: IComment[],
-        parentId: number,
-        user: string,
-        text: string
-    ) => {
-        for (let i = 0; i < comments.length; i++) {
-            let comment = comments[i];
-            if (comment.id === parentId) {
-                comment.children.push(newComment(user, text));
-            }
-        }
-
-        for (let i = 0; i < comments.length; i++) {
-            let comment = comments[i];
-            insertComment(comment.children, parentId, user, text);
-        }
+    const insertComment = (author: string, text: string, parentId?: number) => {
+        const newCmmet = newComment(author, text, parentId);
+        setComments([...comments, newCmmet]);
     };
 
     return (
@@ -86,19 +71,17 @@ const Comments = () => {
                 />
                 <button
                     onClick={() => {
-                        setComments([newComment(comment.author, comment.text), ...comments]);
+                        insertComment(comment.author, comment.text);
                         setComment({author: "", text: ""});
                     }}
                     className="bg-gradient-to-br from-[#A23A2C] to-[#C46655] text-center text-xl text-white border-none rounded-lg px-[10rem] py-2 cursor-pointer hover:bg-gradient-to-br hover:from-[#C46655] hover:to-[#A23A2C] transition duration-200 ease-in-out"
                 >
                     Submit
                 </button>
-
             </div>
-
             <div>
                 {comments.map((comment) => (
-                    <Comment key={comment.id} comment={comment} addReply={addReply}/>
+                    <Comment key={comment.id} comment={comment} comments={comments} addReply={addReply}/>
                 ))}
             </div>
         </div>

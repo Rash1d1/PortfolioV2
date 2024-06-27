@@ -1,16 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {IComment} from "./Comments";
-
-
+import {useUser, useSupabaseClient} from "@supabase/auth-helpers-react";
 
 interface CommentProps {
     comment: IComment
-    addReply: (commentId: number, author: string, text: string) => void;
+    comments: IComment[]
+    addReply: (parentId: number, author: string, text: string) => void;
 }
 
-const Comment: React.FC<CommentProps> = ({ comment, addReply }) => {
+const Comment: React.FC<CommentProps> = ({ comment, comments, addReply }) => {
     const [newComment, setNewComment] = useState({ author: "", text: "" });
     const [showReplyBox, setShowReplyBox] = useState(false);
+
+    const replies = comments.filter(c => c.parentId === comment.id);
 
     return (
         <div className="mb-8 p-4">
@@ -72,17 +74,14 @@ const Comment: React.FC<CommentProps> = ({ comment, addReply }) => {
                         </button>
                     </div>
                 )}
-                {comment.children.length > 0 && (
-                    <ul>
-                        {comment.children.map((childComment) => (
-                            <Comment
-                                key={childComment.id}
-                                comment={childComment}
-                                addReply={addReply}
-                            />
-                        ))}
-                    </ul>
-                )}
+                {replies.map((reply) => (
+                    <Comment
+                        key={reply.id}
+                        comment={reply}
+                        comments={comments}
+                        addReply={addReply}
+                    />
+                ))}
             </div>
         </div>
     );
