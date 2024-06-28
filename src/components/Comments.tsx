@@ -71,8 +71,7 @@ const Comments = () => {
                 />
                 <button
                     onClick={() => {
-                        insertComment(comment.author, comment.text);
-                        setComment({author: "", text: ""});
+                        insertComment(comment.author, comment.text)
                     }}
                     className="bg-gradient-to-br from-[#A23A2C] to-[#C46655] text-center text-xl text-white border-none rounded-lg px-[10rem] py-2 cursor-pointer hover:bg-gradient-to-br hover:from-[#C46655] hover:to-[#A23A2C] transition duration-200 ease-in-out"
                 >
